@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>برنامج حساب الدخل والخارج</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: "Tahoma", Arial, sans-serif;
@@ -11,20 +12,28 @@
       padding: 0;
       direction: rtl;
       text-align: center;
+      color: #222;
     }
     .login {
-      margin-top: 100px;
+      margin: 60px auto 20px;
+      max-width: 900px;
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px #ccc;
     }
     #username {
-      width: 90%;
-      padding: 15px;
-      font-size: 20px;
+      width: 100%;
+      padding: 18px;
+      font-size: 22px;
       border-radius: 8px;
       border: 1px solid #ccc;
+      box-sizing: border-box;
+      margin-bottom: 12px;
     }
     .container {
-      max-width: 900px;
-      margin: auto;
+      max-width: 1000px;
+      margin: 20px auto;
       padding: 20px;
       background: #fff;
       border-radius: 12px;
@@ -32,35 +41,73 @@
       display: none;
     }
     h2 {
-      margin-bottom: 20px;
+      margin: 10px 0 15px;
       color: #333;
+      font-size: 26px;
     }
     .clock {
       font-size: 18px;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
       color: #555;
+    }
+    .salah {
+      color: #8b0000;
+      font-weight: bold;
+      margin: 8px 0 16px;
+    }
+    .video-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    video {
+      width: 420px;
+      max-width: 100%;
+      border: 2px solid #333;
+      border-radius: 8px;
+    }
+    #log {
+      text-align: right;
+      max-width: 420px;
+    }
+    #log p {
+      background: #f7f7f7;
+      padding: 6px 8px;
+      border-radius: 6px;
+      margin: 6px 0;
+      font-size: 14px;
+    }
+    #log img {
+      width: 180px;
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      display: block;
     }
     .buttons {
       display: flex;
-      justify-content: space-around;
-      margin: 20px 0;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin: 18px 0;
     }
     button {
       font-size: 18px;
-      padding: 15px 25px;
+      padding: 14px 22px;
       border-radius: 8px;
       border: none;
       cursor: pointer;
-      transition: 0.3s;
+      transition: 0.2s;
     }
-    button:hover {
-      opacity: 0.8;
-    }
-    .plus { background: #d9ead3; color: green; }
-    .minus { background: #f4cccc; color: red; }
-    .end { background: #cfe2f3; color: blue; }
+    button:hover { opacity: 0.9; }
+    .plus { background: #d9ead3; color: #0a7a0a; }
+    .minus { background: #f4cccc; color: #b00000; }
+    .end { background: #cfe2f3; color: #0a3a8a; }
     .summary {
-      margin: 20px 0;
+      margin: 16px 0;
       text-align: right;
       font-size: 18px;
     }
@@ -68,31 +115,27 @@
       display: flex;
       justify-content: space-between;
       margin: 8px 0;
-      padding: 8px;
+      padding: 10px;
       background: #f9f9f9;
       border-radius: 6px;
     }
-    .income { color: green; font-weight: bold; }
-    .expense { color: red; font-weight: bold; }
-    .net { color: blue; font-weight: bold; }
+    .income { color: #0a7a0a; font-weight: bold; }
+    .expense { color: #b00000; font-weight: bold; }
+    .net { color: #0a3a8a; font-weight: bold; }
     #history {
       margin-top: 20px;
       text-align: right;
     }
-    #history ul {
+    #history h3 { margin-bottom: 10px; }
+    #shiftList {
       list-style: none;
       padding: 0;
     }
-    #history li {
+    #shiftList li {
       background: #eee;
-      margin: 5px 0;
-      padding: 8px;
-      border-radius: 6px;
-    }
-    .footer {
-      margin-top: 30px;
-      font-size: 14px;
-      color: #555;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 8px;
     }
     .details {
       background: #fff;
@@ -101,8 +144,20 @@
       margin-top: 10px;
       border-radius: 6px;
     }
-    video { width: 400px; border: 2px solid #333; border-radius: 8px; margin: 10px; }
-    img { width: 200px; margin: 5px; border: 1px solid #ccc; border-radius: 6px; }
+    .details textarea {
+      width: 100%;
+      height: 70px;
+      box-sizing: border-box;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      padding: 8px;
+      font-size: 14px;
+    }
+    .footer {
+      margin-top: 24px;
+      font-size: 14px;
+      color: #555;
+    }
   </style>
 </head>
 <body>
@@ -111,48 +166,87 @@
   <div class="login" id="login">
     <h2>أدخل اسمك للبدء</h2>
     <input type="text" id="username" placeholder="اكتب اسمك هنا">
-    <button onclick="startApp()">ابدأ</button>
+    <button class="end" id="startBtn">ابدأ</button>
   </div>
 
   <!-- البرنامج الرئيسي -->
   <div class="container" id="app">
     <h2 id="welcome"></h2>
     <div class="clock" id="clock"></div>
-    <p style="color:darkred; font-weight:bold;">صلّى على النبي ﷺ</p>
-    <video id="video" autoplay></video>
-    <div id="log"></div>
-    <div class="buttons">
-      <button class="plus" onclick="addIncome()">+ إضافة دخل</button>
-      <button class="minus" onclick="addExpense()">− إضافة خرج</button>
-      <button class="end" onclick="endShift()">إنهاء الوردية</button>
+    <p class="salah">صلّى على النبي ﷺ</p>
+
+    <div class="video-wrap">
+      <video id="video" autoplay playsinline></video>
+      <div id="log"></div>
     </div>
+
+    <div class="buttons">
+      <button class="plus" id="btnIncome">+ إضافة دخل</button>
+      <button class="minus" id="btnExpense">− إضافة خرج</button>
+      <button class="end" id="btnEndShift">إنهاء الوردية</button>
+    </div>
+
     <div class="summary">
       <div class="row"><span>إجمالي الدخل:</span> <span id="totalIncome" class="income">0</span></div>
       <div class="row"><span>إجمالي الخارج:</span> <span id="totalExpense" class="expense">0</span></div>
       <div class="row"><span>الدخل الفعلي:</span> <span id="netIncome" class="net">0</span></div>
     </div>
+
     <div id="history">
       <h3>سجل الورديات السابقة</h3>
       <ul id="shiftList"></ul>
     </div>
+
     <div class="footer">
       <p>إعداد: Mohamed Reda | للتواصل: 01004927608</p>
     </div>
   </div>
 
+  <!-- عناصر مخفية للمساعدة -->
   <canvas id="canvas" style="display:none;"></canvas>
 
   <script>
+    // عناصر DOM
+    const login = document.getElementById('login');
+    const startBtn = document.getElementById('startBtn');
+    const usernameInput = document.getElementById('username');
+    const app = document.getElementById('app');
+    const welcome = document.getElementById('welcome');
+    const clockEl = document.getElementById('clock');
+    const video = document.getElementById('video');
+    const log = document.getElementById('log');
+    const canvas = document.getElementById('canvas');
+    const btnIncome = document.getElementById('btnIncome');
+    const btnExpense = document.getElementById('btnExpense');
+    const btnEndShift = document.getElementById('btnEndShift');
+    const totalIncomeEl = document.getElementById('totalIncome');
+    const totalExpenseEl = document.getElementById('totalExpense');
+    const netIncomeEl = document.getElementById('netIncome');
+    const shiftList = document.getElementById('shiftList');
+
+    // متغيرات الحالة
     let totalIncome = 0;
     let totalExpense = 0;
     let currentShiftStart = null;
+    let snapshotTimer = null;
 
-    function updateUI() {
-      document.getElementById('totalIncome').textContent = totalIncome;
-      document.getElementById('totalExpense').textContent = totalExpense;
-      document.getElementById('netIncome').textContent = totalIncome - totalExpense;
+    // تحديث الساعة
+    function updateClock() {
+      const now = new Date();
+      clockEl.textContent = "الوقت الآن: " + now.toLocaleTimeString();
     }
+    setInterval(updateClock, 1000);
+    updateClock();
 
+    // تحديث الواجهة المالية
+    function updateUI() {
+      totalIncomeEl.textContent = totalIncome;
+      totalExpenseEl.textContent = totalExpense;
+      netIncomeEl.textContent = totalIncome - totalExpense;
+    }
+    updateUI();
+
+    // دخل/خرج
     function addIncome() {
       const amount = prompt("أدخل مبلغ الدخل:");
       if (amount && !isNaN(amount)) {
@@ -160,7 +254,6 @@
         updateUI();
       }
     }
-
     function addExpense() {
       const amount = prompt("أدخل مبلغ الخارج:");
       if (amount && !isNaN(amount)) {
@@ -169,62 +262,98 @@
       }
     }
 
+    // إنهاء وردية
     function endShift() {
       const endTime = new Date();
-      const li = document.createElement("li");
       const startTimeStr = currentShiftStart ? currentShiftStart.toLocaleString() : "غير محدد";
       const endTimeStr = endTime.toLocaleString();
 
+      const li = document.createElement("li");
       li.innerHTML = `
         <strong>وردية بتاريخ:</strong> ${endTime.toLocaleDateString()}<br>
         الدخل: ${totalIncome} | الخارج: ${totalExpense} | الصافي: ${totalIncome - totalExpense}
         <br>
-        <button onclick="showDetails(this, '${startTimeStr}', '${endTimeStr}')">تفاصيل</button>
+        <button class="end" onclick="showDetails(this, '${startTimeStr}', '${endTimeStr}')">تفاصيل</button>
       `;
-      document.getElementById("shiftList").appendChild(li);
+      shiftList.appendChild(li);
 
+      // تصفير القيم للوردية الجديدة
       totalIncome = 0;
       totalExpense = 0;
       updateUI();
       currentShiftStart = new Date();
     }
 
+    // تفاصيل وردية + ملاحظات
     function showDetails(button, start, end) {
       const detailsDiv = document.createElement("div");
       detailsDiv.className = "details";
       detailsDiv.innerHTML = `
         <p>بدأت الوردية: ${start}</p>
         <p>انتهت الوردية: ${end}</p>
-        <textarea placeholder="أضف ملاحظاتك هنا" style="width:100%;height:60px;"></textarea>
+        <textarea placeholder="أضف ملاحظاتك هنا"></textarea>
       `;
       button.parentNode.appendChild(detailsDiv);
       button.disabled = true;
     }
+    // جعلها متاحة في النطاق العام
+    window.showDetails = showDetails;
 
-    function startApp() {
-      const name = document.getElementById("username").value;
-      if (name.trim() !== "") {
-        document.getElementById("login").style.display = "none";
-        document.getElementById("app").style.display = "block";
-        document.getElementById("welcome").textContent = "أهلاً " + name + " 👋";
-        currentShiftStart = new Date();
-        startCamera();
-      } else {
-        alert("من فضلك أدخل اسمك أولاً");
-      }
-    }
-
-    function updateClock() {
-      const now = new Date();
-      document.getElementById("clock").textContent = "الوقت الآن: " + now.toLocaleTimeString();
-    }
-    setInterval(updateClock, 1000);
-
-    // تشغيل الكاميرا
+    // تشغيل الكاميرا + التقاط تلقائي
     function startCamera() {
-      const video = document.getElementById('video');
-      const canvas = document.getElementById('canvas');
-      const log = document.getElementById('log');
-
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        log.innerHTML += "<p>❌ المتصفح لا يدعم تشغيل الكاميرا</p>";
+        return;
+      }
       navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream =>
+        .then(stream => {
+          video.srcObject = stream;
+          log.innerHTML += "<p>✅ تم تشغيل الفيديو</p>";
+          // التقاط صورة تلقائيًا كل 5 دقائق
+          if (snapshotTimer) clearInterval(snapshotTimer);
+          snapshotTimer = setInterval(takeSnapshot, 5 * 60 * 1000);
+        })
+        .catch(err => {
+          log.innerHTML += "<p>❌ تم رفض تشغيل الكاميرا</p>";
+        });
+    }
+
+    // التقاط صورة
+    function takeSnapshot() {
+      if (!video.videoWidth || !video.videoHeight) {
+        log.innerHTML += "<p>⏳ في انتظار تشغيل الفيديو لالتقاط صورة...</p>";
+        return;
+      }
+      const ctx = canvas.getContext('2d');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0);
+      const imgData = canvas.toDataURL('image/png');
+      const img = document.createElement('img');
+      img.src = imgData;
+      log.appendChild(img);
+      log.innerHTML += "<p>📸 تم التقاط صورة تلقائيًا</p>";
+    }
+
+    // بدء التطبيق
+    function startApp() {
+      const name = usernameInput.value.trim();
+      if (!name) {
+        alert("من فضلك أدخل اسمك أولاً");
+        return;
+      }
+      login.style.display = "none";
+      app.style.display = "block";
+      welcome.textContent = "أهلاً " + name + " 👋";
+      currentShiftStart = new Date();
+      startCamera();
+    }
+
+    // ربط الأزرار
+    startBtn.addEventListener('click', startApp);
+    btnIncome.addEventListener('click', addIncome);
+    btnExpense.addEventListener('click', addExpense);
+    btnEndShift.addEventListener('click', endShift);
+  </script>
+</body>
+</html>
