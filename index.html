@@ -1,223 +1,47 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>حساب الدخل والخارج</title>
-  <style>
-    :root {
-      --bg: #f7f7f7;
-      --card: #ffffff;
-      --text: #222;
-      --muted: #666;
-      --green: #2e7d32;
-      --red: #c62828;
-      --border: #e5e5e5;
-      --accent: #1976d2;
-    }
+<button onclick="endShift()">إنهاء الوردية</button>
 
-    body {
-      margin: 0;
-      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: grid;
-      grid-template-rows: 1fr auto;
-    }
+<div id="history">
+  <h3>سجل الورديات السابقة</h3>
+  <ul id="shiftList"></ul>
+</div>
 
-    .screen {
-      display: grid;
-      place-items: center;
-      padding: 16px;
-    }
+<script>
+  let totalIncome = 0;
+  let totalExpense = 0;
 
-    .controls {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      width: 100%;
-      max-width: 520px;
-    }
+  function updateUI() {
+    document.getElementById('totalIncome').textContent = totalIncome;
+    document.getElementById('totalExpense').textContent = totalExpense;
+    document.getElementById('netIncome').textContent = totalIncome - totalExpense;
+  }
 
-    .btn {
-      display: grid;
-      place-items: center;
-      height: 160px;
-      border-radius: 16px;
-      border: 2px solid var(--border);
-      background: var(--card);
-      font-size: 64px;
-      font-weight: 700;
-      cursor: pointer;
-      user-select: none;
-      transition: transform 0.08s ease, box-shadow 0.12s ease, border-color 0.12s ease;
-    }
-
-    .btn:active { transform: scale(0.98); }
-    .btn.plus { color: var(--green); border-color: #d9ead3; }
-    .btn.minus { color: var(--red); border-color: #f4cccc; }
-
-    .summary {
-      background: var(--card);
-      border-top: 1px solid var(--border);
-      padding: 12px 16px;
-    }
-
-    .summary .title {
-      font-size: 14px;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    .rows {
-      display: grid;
-      gap: 8px;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-    }
-
-    .label { font-weight: 600; }
-    .value { font-variant-numeric: tabular-nums; font-weight: 700; }
-
-    .value.income { color: var(--green); }
-    .value.expense { color: var(--red); }
-    .value.net { color: var(--accent); }
-
-    /* شريط إدخال سريع (اختياري) */
-    .quick {
-      display: grid;
-      grid-template-columns: 1fr auto auto;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .quick input {
-      height: 40px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0 12px;
-      font-size: 16px;
-    }
-
-    .quick button {
-      height: 40px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--card);
-      cursor: pointer;
-      padding: 0 12px;
-      font-weight: 600;
-    }
-
-    .quick .add { color: var(--green); }
-    .quick .sub { color: var(--red); }
-  </style>
-</head>
-<body>
-
-  <main class="screen">
-    <div class="controls">
-      <div class="btn minus" id="btnMinus">−</div>
-      <div class="btn plus" id="btnPlus">+</div>
-    </div>
-  </main>
-
-  <section class="summary">
-    <div class="title">الملخص</div>
-    <div class="rows">
-      <div class="row">
-        <div class="label">إجمالي الدخل</div>
-        <div class="value income" id="totalIncome">0</div>
-      </div>
-      <div class="row">
-        <div class="label">إجمالي الخارج</div>
-        <div class="value expense" id="totalExpense">0</div>
-      </div>
-      <div class="row">
-        <div class="label">الدخل الفعلي (بعد الخارج)</div>
-        <div class="value net" id="netIncome">0</div>
-      </div>
-    </div>
-
-    <!-- إدخال سريع بدون نوافذ منبثقة (اختياري) -->
-    <div class="quick">
-      <input type="number" id="quickAmount" placeholder="اكتب المبلغ هنا" />
-      <button class="add" id="quickAdd">+ إضافة دخل</button>
-      <button class="sub" id="quickSub">− إضافة خارج</button>
-    </div>
-  </section>
-
-  <script>
-    let totalIncome = 0;
-    let totalExpense = 0;
-
-    const elIncome = document.getElementById('totalIncome');
-    const elExpense = document.getElementById('totalExpense');
-    const elNet = document.getElementById('netIncome');
-
-    function format(n) {
-      // تنسيق بسيط بالأرقام العربية المحلية
-      return new Intl.NumberFormat('ar-EG').format(n);
-    }
-
-    function updateUI() {
-      elIncome.textContent = format(totalIncome);
-      elExpense.textContent = format(totalExpense);
-      elNet.textContent = format(totalIncome - totalExpense);
-    }
-
-    function askAmount(type) {
-      const label = type === 'income' ? 'أدخل مبلغ الدخل' : 'أدخل مبلغ الخارج';
-      const input = prompt(label);
-      if (input === null) return; // إلغاء
-      const amount = Number(input);
-      if (!isFinite(amount) || amount <= 0) {
-        alert('من فضلك أدخل رقم صحيح أكبر من صفر.');
-        return;
-      }
-      if (type === 'income') totalIncome += amount;
-      else totalExpense += amount;
+  function addIncome() {
+    const amount = prompt("أدخل مبلغ الدخل:");
+    if (amount && !isNaN(amount)) {
+      totalIncome += Number(amount);
       updateUI();
     }
+  }
 
-    // أزرار كبيرة
-    document.getElementById('btnPlus').addEventListener('click', () => askAmount('income'));
-    document.getElementById('btnMinus').addEventListener('click', () => askAmount('expense'));
-
-    // إدخال سريع
-    const quickAmount = document.getElementById('quickAmount');
-    document.getElementById('quickAdd').addEventListener('click', () => {
-      const amount = Number(quickAmount.value);
-      if (!isFinite(amount) || amount <= 0) {
-        alert('من فضلك أدخل رقم صحيح أكبر من صفر.');
-        return;
-      }
-      totalIncome += amount;
-      quickAmount.value = '';
+  function addExpense() {
+    const amount = prompt("أدخل مبلغ الخارج:");
+    if (amount && !isNaN(amount)) {
+      totalExpense += Number(amount);
       updateUI();
-    });
+    }
+  }
 
-    document.getElementById('quickSub').addEventListener('click', () => {
-      const amount = Number(quickAmount.value);
-      if (!isFinite(amount) || amount <= 0) {
-        alert('من فضلك أدخل رقم صحيح أكبر من صفر.');
-        return;
-      }
-      totalExpense += amount;
-      quickAmount.value = '';
-      updateUI();
-    });
+  function endShift() {
+    // حفظ بيانات الوردية في القائمة
+    const li = document.createElement("li");
+    li.textContent = `الدخل: ${totalIncome} | الخارج: ${totalExpense} | الصافي: ${totalIncome - totalExpense}`;
+    document.getElementById("shiftList").appendChild(li);
 
-    // تحديث أولي
+    // تصفير القيم للوردية الجديدة
+    totalIncome = 0;
+    totalExpense = 0;
     updateUI();
-  </script>
-</body>
-</html>
+  }
+
+  updateUI();
+</script>
