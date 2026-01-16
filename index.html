@@ -1,47 +1,167 @@
-<button onclick="endShift()">إنهاء الوردية</button>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>برنامج حساب الدخل والخارج</title>
+  <style>
+    body {
+      font-family: "Tahoma", Arial, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      direction: rtl;
+      text-align: center;
+    }
+    .login {
+      margin-top: 100px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 0 10px #ccc;
+      display: none;
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .buttons {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+    }
+    button {
+      font-size: 18px;
+      padding: 15px 25px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+    .plus { background: #d9ead3; color: green; }
+    .minus { background: #f4cccc; color: red; }
+    .end { background: #cfe2f3; color: blue; }
+    .summary {
+      margin: 20px 0;
+      text-align: right;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 8px 0;
+      padding: 8px;
+      background: #f9f9f9;
+      border-radius: 6px;
+    }
+    .income { color: green; font-weight: bold; }
+    .expense { color: red; font-weight: bold; }
+    .net { color: blue; font-weight: bold; }
+    #history {
+      margin-top: 20px;
+      text-align: right;
+    }
+    #history ul {
+      list-style: none;
+      padding: 0;
+    }
+    #history li {
+      background: #eee;
+      margin: 5px 0;
+      padding: 8px;
+      border-radius: 6px;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
 
-<div id="history">
-  <h3>سجل الورديات السابقة</h3>
-  <ul id="shiftList"></ul>
-</div>
+  <!-- شاشة تسجيل الاسم -->
+  <div class="login">
+    <h2>أدخل اسمك للبدء</h2>
+    <input type="text" id="username" placeholder="اكتب اسمك هنا">
+    <button onclick="startApp()">ابدأ</button>
+  </div>
 
-<script>
-  let totalIncome = 0;
-  let totalExpense = 0;
+  <!-- البرنامج الرئيسي -->
+  <div class="container" id="app">
+    <h2 id="welcome"></h2>
+    <div class="buttons">
+      <button class="plus" onclick="addIncome()">+ إضافة دخل</button>
+      <button class="minus" onclick="addExpense()">− إضافة خرج</button>
+      <button class="end" onclick="endShift()">إنهاء الوردية</button>
+    </div>
+    <div class="summary">
+      <div class="row"><span>إجمالي الدخل:</span> <span id="totalIncome" class="income">0</span></div>
+      <div class="row"><span>إجمالي الخارج:</span> <span id="totalExpense" class="expense">0</span></div>
+      <div class="row"><span>الدخل الفعلي:</span> <span id="netIncome" class="net">0</span></div>
+    </div>
+    <div id="history">
+      <h3>سجل الورديات السابقة</h3>
+      <ul id="shiftList"></ul>
+    </div>
+    <div class="footer">
+      <p>إعداد: Mohamed Reda | للتواصل: 01004927608</p>
+    </div>
+  </div>
 
-  function updateUI() {
-    document.getElementById('totalIncome').textContent = totalIncome;
-    document.getElementById('totalExpense').textContent = totalExpense;
-    document.getElementById('netIncome').textContent = totalIncome - totalExpense;
-  }
+  <script>
+    let totalIncome = 0;
+    let totalExpense = 0;
 
-  function addIncome() {
-    const amount = prompt("أدخل مبلغ الدخل:");
-    if (amount && !isNaN(amount)) {
-      totalIncome += Number(amount);
+    function updateUI() {
+      document.getElementById('totalIncome').textContent = totalIncome;
+      document.getElementById('totalExpense').textContent = totalExpense;
+      document.getElementById('netIncome').textContent = totalIncome - totalExpense;
+    }
+
+    function addIncome() {
+      const amount = prompt("أدخل مبلغ الدخل:");
+      if (amount && !isNaN(amount)) {
+        totalIncome += Number(amount);
+        updateUI();
+      }
+    }
+
+    function addExpense() {
+      const amount = prompt("أدخل مبلغ الخارج:");
+      if (amount && !isNaN(amount)) {
+        totalExpense += Number(amount);
+        updateUI();
+      }
+    }
+
+    function endShift() {
+      const li = document.createElement("li");
+      li.textContent = `الدخل: ${totalIncome} | الخارج: ${totalExpense} | الصافي: ${totalIncome - totalExpense}`;
+      document.getElementById("shiftList").appendChild(li);
+
+      totalIncome = 0;
+      totalExpense = 0;
       updateUI();
     }
-  }
 
-  function addExpense() {
-    const amount = prompt("أدخل مبلغ الخارج:");
-    if (amount && !isNaN(amount)) {
-      totalExpense += Number(amount);
-      updateUI();
+    function startApp() {
+      const name = document.getElementById("username").value;
+      if (name.trim() !== "") {
+        document.querySelector(".login").style.display = "none";
+        document.getElementById("app").style.display = "block";
+        document.getElementById("welcome").textContent = "أهلاً " + name + " 👋";
+      } else {
+        alert("من فضلك أدخل اسمك أولاً");
+      }
     }
-  }
 
-  function endShift() {
-    // حفظ بيانات الوردية في القائمة
-    const li = document.createElement("li");
-    li.textContent = `الدخل: ${totalIncome} | الخارج: ${totalExpense} | الصافي: ${totalIncome - totalExpense}`;
-    document.getElementById("shiftList").appendChild(li);
-
-    // تصفير القيم للوردية الجديدة
-    totalIncome = 0;
-    totalExpense = 0;
     updateUI();
-  }
-
-  updateUI();
-</script>
+  </script>
+</body>
+</html>
