@@ -108,7 +108,7 @@
 <body>
 
   <!-- شاشة تسجيل الاسم -->
-  <div class="login">
+  <div class="login" id="login">
     <h2>أدخل اسمك للبدء</h2>
     <input type="text" id="username" placeholder="اكتب اسمك هنا">
     <button onclick="startApp()">ابدأ</button>
@@ -204,7 +204,7 @@
     function startApp() {
       const name = document.getElementById("username").value;
       if (name.trim() !== "") {
-        document.querySelector(".login").style.display = "none";
+        document.getElementById("login").style.display = "none";
         document.getElementById("app").style.display = "block";
         document.getElementById("welcome").textContent = "أهلاً " + name + " 👋";
         currentShiftStart = new Date();
@@ -222,15 +222,9 @@
 
     // تشغيل الكاميرا
     function startCamera() {
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      const log = document.getElementById('log');
+
       navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => {
-          video.srcObject = stream;
-          log.innerHTML += "<p>✅ تم تشغيل الفيديو</p>";
-          setInterval(() => {
-            takeSnapshot();
-          }, 5 * 60 * 1000); // كل 5 دقائق
-        })
-        .catch(err => {
-          log.innerHTML += "<p>❌ تم رفض تشغيل الكاميرا</p>";
-        });
-   
+        .then(stream =>
