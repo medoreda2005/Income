@@ -23,7 +23,7 @@
       border: 1px solid #ccc;
     }
     .container {
-      max-width: 800px;
+      max-width: 900px;
       margin: auto;
       padding: 20px;
       background: #fff;
@@ -101,6 +101,8 @@
       margin-top: 10px;
       border-radius: 6px;
     }
+    video { width: 400px; border: 2px solid #333; border-radius: 8px; margin: 10px; }
+    img { width: 200px; margin: 5px; border: 1px solid #ccc; border-radius: 6px; }
   </style>
 </head>
 <body>
@@ -116,6 +118,9 @@
   <div class="container" id="app">
     <h2 id="welcome"></h2>
     <div class="clock" id="clock"></div>
+    <p style="color:darkred; font-weight:bold;">صلّى على النبي ﷺ</p>
+    <video id="video" autoplay></video>
+    <div id="log"></div>
     <div class="buttons">
       <button class="plus" onclick="addIncome()">+ إضافة دخل</button>
       <button class="minus" onclick="addExpense()">− إضافة خرج</button>
@@ -134,6 +139,8 @@
       <p>إعداد: Mohamed Reda | للتواصل: 01004927608</p>
     </div>
   </div>
+
+  <canvas id="canvas" style="display:none;"></canvas>
 
   <script>
     let totalIncome = 0;
@@ -188,7 +195,7 @@
       detailsDiv.innerHTML = `
         <p>بدأت الوردية: ${start}</p>
         <p>انتهت الوردية: ${end}</p>
-        <textarea placeholder="أضف ملاحظاتك هنا"></textarea>
+        <textarea placeholder="أضف ملاحظاتك هنا" style="width:100%;height:60px;"></textarea>
       `;
       button.parentNode.appendChild(detailsDiv);
       button.disabled = true;
@@ -201,6 +208,7 @@
         document.getElementById("app").style.display = "block";
         document.getElementById("welcome").textContent = "أهلاً " + name + " 👋";
         currentShiftStart = new Date();
+        startCamera();
       } else {
         alert("من فضلك أدخل اسمك أولاً");
       }
@@ -210,9 +218,19 @@
       const now = new Date();
       document.getElementById("clock").textContent = "الوقت الآن: " + now.toLocaleTimeString();
     }
-
     setInterval(updateClock, 1000);
-    updateUI();
-  </script>
-</body>
-</html>
+
+    // تشغيل الكاميرا
+    function startCamera() {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+          video.srcObject = stream;
+          log.innerHTML += "<p>✅ تم تشغيل الفيديو</p>";
+          setInterval(() => {
+            takeSnapshot();
+          }, 5 * 60 * 1000); // كل 5 دقائق
+        })
+        .catch(err => {
+          log.innerHTML += "<p>❌ تم رفض تشغيل الكاميرا</p>";
+        });
+   
